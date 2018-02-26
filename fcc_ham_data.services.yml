@@ -2,3 +2,8 @@ services:
   fcc_ham_data.fcc_schema_parser:
     class: Drupal\fcc_ham_data\FccSchemaParser
     arguments: ['@module_handler']
+
+
+  fcc_ham_data.importer_manager:
+    class: 'Drupal\fcc_ham_data\Plugin\Importer\ImporterManager'
+    parent: default_plugin_manager
