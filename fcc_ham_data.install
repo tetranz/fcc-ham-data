@@ -10,7 +10,7 @@ function fcc_ham_data_schema() {
   // Generate the schema for the import files from the SQL file from FCC.
   $schema = [];
   foreach (['hd', 'en', 'am'] as $table_id) {
-    $table_name = 'fcc_ham_' . $table_id;
+    $table_name = 'fcc_license_' . $table_id;
     $schema[$table_name] = [
       'fields' => $parser->getFields($table_id),
     ];
@@ -28,7 +28,7 @@ function fcc_ham_data_schema() {
  */
 function _fcc_ham_data_get_extra_schema() {
   return [
-    'fcc_ham_hd' => [
+    'fcc_license_hd' => [
       'primary key' => ['unique_system_identifier'],
       'indexes' => [
         'call_sign' => ['call_sign'],
@@ -41,7 +41,7 @@ function _fcc_ham_data_get_extra_schema() {
         ],
       ],
     ],
-    'fcc_ham_en' => [
+    'fcc_license_en' => [
       'primary key' => ['unique_system_identifier'],
       'fields' => [
         'row_hash' => [
@@ -56,7 +56,7 @@ function _fcc_ham_data_get_extra_schema() {
         ],
       ],
     ],
-    'fcc_ham_am' => [
+    'fcc_license_am' => [
       'primary key' => ['unique_system_identifier'],
       'fields' => [
         'row_hash' => [
@@ -76,6 +76,6 @@ function fcc_ham_data_uninstall() {
   $schema = \Drupal::database()->schema();
 
   foreach (['hd', 'en', 'am'] as $table_id) {
-    $schema->dropTable('fcc_ham_' . $table_id);
+    $schema->dropTable('fcc_license_' . $table_id);
   }
 }
