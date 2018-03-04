@@ -49,6 +49,7 @@ class FccHamDataCommands extends DrushCommands {
       throw new \InvalidArgumentException('File not found or not readable: ' . $file_path);
     }
 
+    // Pass the writer to report progress.
     $importer->import($file_path, [$this->io(), 'writeln']);
   }
 
