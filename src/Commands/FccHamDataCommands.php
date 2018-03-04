@@ -3,7 +3,7 @@
 namespace Drupal\fcc_ham_data\Commands;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\fcc_ham_data\EntityUpdater;
+use Drupal\fcc_ham_data\DataUtils;
 use Drupal\fcc_ham_data\Plugin\Importer\ImporterInterface;
 use Drupal\fcc_ham_data\Plugin\Importer\ImporterManager;
 use Drush\Commands\DrushCommands;
@@ -16,28 +16,27 @@ class FccHamDataCommands extends DrushCommands {
   /**
    * The importer plugin manager.
    *
-   * @var \Drupal\fcc_ham_data\Commands\ImporterManger
+   * @var \Drupal\fcc_ham_data\Plugin\Importer\ImporterManager
    */
   private $importerManager;
-
   /**
-   * The entity updater.
+   * Data utilities service.
    *
-   * @var \Drupal\fcc_ham_data\EntityUpdater
+   * @var \Drupal\fcc_ham_data\DataUtils
    */
-  private $entityUpdater;
+  private $dataUtils;
 
   /**
    * FccHamDataCommands constructor.
    *
-   * @param \Drupal\fcc_ham_data\Commands\ImporterManger $importer_manager
+   * @param \Drupal\fcc_ham_data\Plugin\Importer\ImporterManager $importer_manager
    *   The import manager.
-   * @param EntityUpdater $entity_updater
-   *   The entity updater.
+   * @param \Drupal\fcc_ham_data\DataUtils $data_utils
+   *   Data utilities service.
    */
-  public function __construct(ImporterManager $importer_manager, EntityUpdater $entity_updater) {
+  public function __construct(ImporterManager $importer_manager, DataUtils $data_utils) {
     $this->importerManager = $importer_manager;
-    $this->entityUpdater = $entity_updater;
+    $this->dataUtils = $data_utils;
   }
 
   /**
@@ -79,6 +78,7 @@ class FccHamDataCommands extends DrushCommands {
    * @command fcc_ham_data:update-hash
    */
   public function updateHash() {
-    $this->entityUpdater->updateHash();
+    $this->dataUtils->updateHash();
   }
+
 }

@@ -7,6 +7,6 @@ services:
     class: Drupal\fcc_ham_data\Plugin\Importer\ImporterManager
     parent: default_plugin_manager
 
-  fcc_ham_data.entity_updater:
-    class: Drupal\fcc_ham_data\EntityUpdater
+  fcc_ham_data.data_utils:
+    class: Drupal\fcc_ham_data\DataUtils
     arguments: ['@database']

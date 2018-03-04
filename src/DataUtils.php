@@ -5,9 +5,9 @@ namespace Drupal\fcc_ham_data;
 use Drupal\Core\Database\Connection;
 
 /**
- * Service for updating entity from imported FCC data.
+ * A few data utilities for the imported FCC data.
  */
-class EntityUpdater {
+class DataUtils {
 
   /**
    * The database connnection.
