@@ -29,10 +29,6 @@ function fcc_ham_data_schema() {
 function _fcc_ham_data_get_extra_schema() {
   return [
     'fcc_license_hd' => [
-      'primary key' => ['unique_system_identifier'],
-      'indexes' => [
-        'call_sign' => ['call_sign'],
-      ],
       'fields' => [
         'row_hash' => [
           'type' => 'varchar',
@@ -40,9 +36,13 @@ function _fcc_ham_data_get_extra_schema() {
           'description' => 'A hash of the entire row for easy detection of changes.',
         ],
       ],
+      'primary key' => ['unique_system_identifier'],
+      'indexes' => [
+        'call_sign' => ['call_sign'],
+        'row_hash' => ['row_hash'],
+      ],
     ],
     'fcc_license_en' => [
-      'primary key' => ['unique_system_identifier'],
       'fields' => [
         'row_hash' => [
           'type' => 'varchar',
@@ -55,15 +55,23 @@ function _fcc_ham_data_get_extra_schema() {
           'description' => 'A hash of just the address fields to help with geocoding.',
         ],
       ],
+      'primary key' => ['unique_system_identifier'],
+      'indexes' => [
+        'row_hash' => ['row_hash'],
+        'address_hash' => ['address_hash'],
+      ],
     ],
     'fcc_license_am' => [
-      'primary key' => ['unique_system_identifier'],
       'fields' => [
         'row_hash' => [
           'type' => 'varchar',
           'length' => 40,
           'description' => 'A hash of the entire row for easy detection of changes.',
         ],
+      ],
+      'primary key' => ['unique_system_identifier'],
+      'indexes' => [
+        'row_hash' => ['row_hash'],
       ],
     ],
   ];
