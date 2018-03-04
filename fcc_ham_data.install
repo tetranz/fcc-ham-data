@@ -35,11 +35,15 @@ function _fcc_ham_data_get_extra_schema() {
           'length' => 40,
           'description' => 'A hash of the entire row for easy detection of changes.',
         ],
+        'total_hash' => [
+          'type' => 'varchar',
+          'length' => 40,
+          'description' => 'A hash of the three table joined result for easy detection of changes.',
+        ],
       ],
       'primary key' => ['unique_system_identifier'],
       'indexes' => [
         'call_sign' => ['call_sign'],
-        'row_hash' => ['row_hash'],
       ],
     ],
     'fcc_license_en' => [
@@ -56,10 +60,6 @@ function _fcc_ham_data_get_extra_schema() {
         ],
       ],
       'primary key' => ['unique_system_identifier'],
-      'indexes' => [
-        'row_hash' => ['row_hash'],
-        'address_hash' => ['address_hash'],
-      ],
     ],
     'fcc_license_am' => [
       'fields' => [
@@ -70,9 +70,6 @@ function _fcc_ham_data_get_extra_schema() {
         ],
       ],
       'primary key' => ['unique_system_identifier'],
-      'indexes' => [
-        'row_hash' => ['row_hash'],
-      ],
     ],
   ];
 }

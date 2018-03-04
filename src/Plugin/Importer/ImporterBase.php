@@ -147,7 +147,6 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
           // Report progress.
           $callback($imported_count);
         }
-
       }
     }
 
