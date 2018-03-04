@@ -12,4 +12,11 @@ namespace Drupal\fcc_ham_data\Plugin\Importer;
  */
 class ImporterFccHd extends ImporterBase {
 
+  /**
+   * (@inheritdoc}
+   */
+  public function getTableId() {
+    return 'hd';
+  }
+
 }

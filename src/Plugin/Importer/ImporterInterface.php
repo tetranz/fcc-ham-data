@@ -8,14 +8,21 @@ namespace Drupal\fcc_ham_data\Plugin\Importer;
 interface ImporterInterface {
 
   /**
+   * Get database table id.
+   *
+   * @return string
+   *   The two character FCC id of the database table.
+   */
+  public function getTableId();
+
+  /**
    * Import file into database table.
    * 
-   * @param string $table_id
-   *   Two letter FCC code for the file.
-   *
    * @param $file_path
    *   File path for the file.
+   * @param callable $callback
+   *   Optional callable used to report progress. 
    */
-  public function import($table_id, $file_path);
-
+  public function import($file_path, callable $callback = NULL);
+  
 }
