@@ -5,6 +5,7 @@ namespace Drupal\fcc_ham_data\Plugin\Importer;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\fcc_ham_data\FccSchemaParser;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
 
@@ -35,26 +36,39 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
   protected $dbConnection;
 
   /**
-   * The FCC  schema parser.
+   * The FCC schema parser.
    *
    * @var FccSchemaParser
    */
   private $fccSchemaParser;
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  private $logger;
+
+  /**
    * ImporterBase constructor.
 
    * {@inheritDoc}
    * @param \Drupal\Core\Database\Connection $db_connection
+   *   The database connection.
+   * @param \Drupal\fcc_ham_data\FccSchemaParser $fcc_schema_parser
+   *   The FCC schema parser.
+   * @param \Psr\Log\LoggerInterface $logger
    */
   public function __construct(
     array $configuration, $plugin_id, $plugin_definition,
     Connection $db_connection,
-    FccSchemaParser $fcc_schema_parser
+    FccSchemaParser $fcc_schema_parser,
+    LoggerInterface $logger
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->dbConnection = $db_connection;
     $this->fccSchemaParser = $fcc_schema_parser;
+    $this->logger = $logger;
   }
 
   /**
@@ -67,7 +81,8 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
     return new static(
       $configuration, $plugin_id, $plugin_definition,
       $container->get('database'),
-      $container->get('fcc_ham_data.fcc_schema_parser')
+      $container->get('fcc_ham_data.fcc_schema_parser'),
+      $container->get('logger.channel.fcc_ham_data')
     );
   }
 
@@ -155,6 +170,8 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
       // Insert the last partial block. 
       $query->execute();
     }
+
+    $this->logger->info(sprintf('%s rows imported from %s', $imported_count, $file_path));
   }
 
   /**

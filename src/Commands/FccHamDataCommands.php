@@ -78,7 +78,7 @@ class FccHamDataCommands extends DrushCommands {
    * @command fcc_ham_data:update-hash
    */
   public function updateHash() {
-    $this->dataUtils->updateHash();
+    $this->dataUtils->updateHash([$this->io(), 'writeln']);
   }
 
 }
