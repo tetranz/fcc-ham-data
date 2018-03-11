@@ -17,7 +17,7 @@ function fcc_ham_data_schema() {
   }
 
   // Add our extra schema components.
-  return array_merge_recursive($schema, _fcc_ham_data_get_extra_schema());
+  return array_replace_recursive($schema, _fcc_ham_data_get_extra_schema());
 }
 
 /**
@@ -57,6 +57,14 @@ function _fcc_ham_data_get_extra_schema() {
           'type' => 'varchar',
           'length' => 40,
           'description' => 'A hash of just the address fields to help with geocoding.',
+        ],
+        'street_address' => [
+          // Make room for street_address, po_box.
+          'length' => 82,
+        ],
+        'zip_code' => [
+          // Make room for dash in 9 digit zip code.
+          'length' => 10,
         ],
       ],
       'primary key' => ['unique_system_identifier'],
