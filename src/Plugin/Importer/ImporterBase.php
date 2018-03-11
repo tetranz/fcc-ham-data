@@ -105,6 +105,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
       $row_count++;
       $row_string = $file->fgets();
       $row_array = explode('|', $row_string);
+      $row_array = array_map('trim', $row_array);
 
       if (count($row_array) === 1 && empty($row_array[0])) {
         // Blank line, probably at the end of file.
