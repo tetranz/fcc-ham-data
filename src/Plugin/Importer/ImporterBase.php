@@ -97,11 +97,18 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
     $table_name = 'fcc_license_' . $this->getTableId();
     // Read FCC schema SQL.
-    $fields = array_keys($this->fccSchemaParser->getFields($this->getTableId()));
-    $file_field_count = count($fields);
+    $fields_info = $this->fccSchemaParser->getFields($this->getTableId());
+    $field_names = array_keys($fields_info);
+    $file_field_count = count($field_names);
+
+    $fields_info = array_map(function ($value) {
+      $value = (object) $value;
+      $value->is_string = in_array($value->type, ['char', 'varchar']);
+      return $value;
+    }, $fields_info);
 
     // Add an extra fields.
-    $this->alterFieldList($fields);
+    $this->alterFieldList($field_names);
 
     $this->dbConnection->truncate($table_name)
       ->execute();
@@ -114,7 +121,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
     // Use a multi-insert query for performance.
     $query = $this->dbConnection
       ->insert($table_name)
-      ->fields($fields);
+      ->fields($field_names);
 
     while(!$file->eof()) {
       $row_count++;
@@ -142,8 +149,29 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
       // Assemble key / value array data to insert. 
       $values = [];
-      foreach ($fields as $idx  => $name) {
-        $values[$name] = !empty($row_array[$idx]) ? utf8_encode($row_array[$idx]) : NULL;
+      $idx = 0;
+
+      foreach ($fields_info as $name => $info) {
+        $value = $row_array[$idx];
+
+        if ($info->is_string) {
+          // The files have no BOM so they are presumably UTF-8 or plain ASCII.
+          // A few (like one in a million) have values that cannot be
+          // represented in UTF-8. This avoids an error when saving to the db.
+          $value = utf8_encode($value);
+        }
+
+        if ($info->is_string && strlen($value) > $info->length) {
+          $this->printFeedback(sprintf(
+            '%s is length %s, expected %s at row %s',
+            $name, strlen($value), $info->length, $row_count
+          ), $callback);
+
+          $value = substr($value, 0, $info->length);
+        }
+
+        $values[$name] = $value ?: NULL;
+        $idx++;
       }
 
       // Add any extra values. 
@@ -166,7 +194,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
         // Start next query.
         $query = $this->dbConnection
           ->insert($table_name)
-          ->fields($fields);
+          ->fields($field_names);
 
         $imported_count += $block_count;
         $block_count = 0;
