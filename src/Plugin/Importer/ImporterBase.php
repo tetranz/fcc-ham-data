@@ -158,7 +158,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
           // The files have no BOM so they are presumably UTF-8 or plain ASCII.
           // A few (like one in a million) have values that cannot be
           // represented in UTF-8. This avoids an error when saving to the db.
-          $value = utf8_encode($value);
+          $value = iconv('ASCII', 'UTF-8//IGNORE', $value);
         }
 
         if ($info->is_string && strlen($value) > $info->length) {
