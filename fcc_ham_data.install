@@ -40,6 +40,9 @@ function _fcc_ham_data_get_extra_schema() {
           'length' => 40,
           'description' => 'A hash of the three table joined result for easy detection of changes.',
         ],
+        'certifier_last_name' => [
+          'length' => 30,
+        ],
       ],
       'primary key' => ['unique_system_identifier'],
       'indexes' => [
