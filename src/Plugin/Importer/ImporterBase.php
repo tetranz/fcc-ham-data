@@ -129,9 +129,14 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
       if (count($row_array) < $file_field_count) {
         // Row has less columns than expected.
-        if ($callback !== NULL) {
-           $callback(sprintf('Row %s has %s rows, expected %s%s', $row_count, count($row_array), count($file_field_count)));
-        }
+          $this->printFeedback(sprintf(
+              'Row %s has %s rows, expected %s%s',
+              $row_count,
+              count($row_array),
+              count($file_field_count)
+            ),
+            $callback
+          );
         continue;
       }
 
@@ -149,7 +154,14 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
       if ($block_count == static::IMPORT_BLOCK_SIZE) {
         // Insert the rows.
-        $query->execute();
+        try {
+          $query->execute();
+        }
+        catch (\Exception $ex) {
+          // The message contains all 10,000 inserts. Throw an exception with
+          // a shorter readable message.
+          throw new \Exception(substr($ex->getMessage(), 0, 2000));
+        }
 
         // Start next query.
         $query = $this->dbConnection
@@ -159,9 +171,9 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
         $imported_count += $block_count;
         $block_count = 0;
 
-        if ($callback !== NULL && ($imported_count % static::CALLBACK_BLOCK_SIZE) === 0) {
+        if (($imported_count % static::CALLBACK_BLOCK_SIZE) === 0) {
           // Report progress.
-          $callback($imported_count);
+          $this->printFeedback($imported_count, $callback);
         }
       }
     }
@@ -196,6 +208,20 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
    */
   protected function alterValues($row_string, $row_array, &$values) {
     $values['row_hash'] = sha1($row_string);
+  }
+
+  /**
+   * Print feedback if a callback from supplied. Use for drush commands.
+   *
+   * @param string $message
+   *   The message to print.
+   * @param callable|NULL $callback
+   *   Callback.
+   */
+  protected function printFeedback($message, callable $callback = NULL) {
+    if ($callback !== NULL) {
+      $callback($message);
+    }
   }
 
 }
