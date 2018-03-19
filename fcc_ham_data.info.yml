@@ -1,5 +1,5 @@
 name: 'FCC Ham data'
 type: module
-description: 'Import FCC license data for amateur radio licenses.'
+description: 'Import FCC data for amateur radio licenses.'
 core: 8.x
 package: 'Custom'
