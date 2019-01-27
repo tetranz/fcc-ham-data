@@ -95,7 +95,6 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
       throw new \Exception(sprintf('File %s does not exist.', $file_path));
     }
 
-    $table_name = 'fcc_license_' . $this->getTableId();
     // Read FCC schema SQL.
     $fields_info = $this->fccSchemaParser->getFields($this->getTableId());
     $field_names = array_keys($fields_info);
@@ -110,8 +109,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
     // Add an extra fields.
     $this->alterFieldList($field_names);
 
-    $this->dbConnection->truncate($table_name)
-      ->execute();
+    $this->truncateTable();
 
     $file = new \SplFileObject($file_path);
     $row_count = 0;
@@ -120,7 +118,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
     // Use a multi-insert query for performance.
     $query = $this->dbConnection
-      ->insert($table_name)
+      ->insert($this->getTableName())
       ->fields($field_names);
 
     while(!$file->eof()) {
@@ -193,7 +191,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
 
         // Start next query.
         $query = $this->dbConnection
-          ->insert($table_name)
+          ->insert($this->getTableName())
           ->fields($field_names);
 
         $imported_count += $block_count;
@@ -212,6 +210,24 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
     }
 
     $this->logger->info(sprintf('%s rows imported from %s', $imported_count, $file_path));
+  }
+
+  /**
+   * Get database table name.
+   *
+   * @return string
+   *   Database table name.
+   */
+  protected function getTableName() {
+    return $table_name = 'fcc_license_' . $this->getTableId();
+  }
+
+  /**
+   * Truncate database table.
+   */
+  public function truncateTable() {
+    $this->dbConnection->truncate($this->getTableName())
+      ->execute();
   }
 
   /**

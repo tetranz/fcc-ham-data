@@ -24,5 +24,10 @@ interface ImporterInterface {
    *   Optional callable used to report progress. 
    */
   public function import($file_path, callable $callback = NULL);
-  
+
+  /**
+   * Truncate table.
+   */
+  public function truncateTable();
+
 }

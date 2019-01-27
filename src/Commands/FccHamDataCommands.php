@@ -47,7 +47,6 @@ class FccHamDataCommands extends DrushCommands {
    * @param $file_path
    *   Full path to the file..
    * @usage fcc_ham_data:import file_type file_path
-   *   Usage description
    *
    * @command fcc_ham_data:import
    */
@@ -67,6 +66,27 @@ class FccHamDataCommands extends DrushCommands {
 
     // Pass the writer to report progress.
     $importer->import($file_path, [$this->io(), 'writeln']);
+  }
+
+  /**
+   * Truncate database table.
+   *
+   * @param $file_type
+   *   Two character FCC code.
+   * @usage fcc_ham_data:trucate-db-table file_type
+   *
+   * @command fcc_ham_data:truncate
+   */
+  public function truncateTable($file_type) {
+    try {
+      /** @var ImporterInterface $importer */
+      $importer = $this->importerManager->createInstance($file_type);
+    }
+    catch (PluginNotFoundException $ex) {
+      throw new \InvalidArgumentException('Invalid file type: ' . $file_type);
+    }
+
+    $importer->truncateTable();
   }
 
   /**
