@@ -68,6 +68,9 @@ function _fcc_ham_data_get_extra_schema() {
         ],
       ],
       'primary key' => ['unique_system_identifier'],
+      'indexes' => [
+        'address_hash' => ['address_hash'],
+      ],
     ],
     'fcc_license_am' => [
       'fields' => [
