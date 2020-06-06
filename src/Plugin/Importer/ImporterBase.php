@@ -207,6 +207,7 @@ abstract class ImporterBase extends ContextAwarePluginBase implements ImporterIn
     if ($block_count > 0) {
       // Insert the last partial block. 
       $query->execute();
+      $imported_count += $block_count;
     }
 
     $this->logger->info(sprintf('%s rows imported from %s', $imported_count, $file_path));
