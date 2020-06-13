@@ -93,12 +93,22 @@ class FccHamDataCommands extends DrushCommands {
    * Update the hash for the joined query.
    *
    * @usage fcc_ham_data:update-hash
-   *   Usage description
    *
    * @command fcc_ham_data:update-hash
    */
   public function updateHash() {
     $this->dataUtils->updateHash([$this->io(), 'writeln']);
+  }
+
+  /**
+   * Report import counts.
+   *
+   * @usage fcc_ham_data:report-import-counts
+   *
+   * @command fcc_ham_data:report-input-counts
+   */
+  public function reportImportCounts() {
+    return $this->dataUtils->reportImportCounts();
   }
 
 }

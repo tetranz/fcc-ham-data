@@ -4,12 +4,20 @@ namespace Drupal\fcc_ham_data;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Psr\Log\LoggerInterface;
 
 /**
  * A few data utilities for the imported FCC data.
  */
 class DataUtils {
+
+  const MIN_ROW_COUNT_HD = 1400000;
+  const MIN_ROW_COUNT_EN = 1400000;
+  const MIN_ROW_COUNT_AM = 1400000;
+
+  use StringTranslationTrait;
 
   /**
    * The database connnection.
@@ -61,6 +69,65 @@ class DataUtils {
 
     if ($callback !== NULL) {
       $callback($msg);
+    }
+  }
+
+  /**
+   * Get row counts for imported data.
+   *
+   * @return array
+   *   Array of counts with keys 'hd', 'en', 'am'.
+   */
+  private function getImportCounts() {
+    return [
+      'hd' => $this->dbConnection->query('SELECT COUNT(*) FROM fcc_license_hd')->fetchCol()[0],
+      'en' => $this->dbConnection->query('SELECT COUNT(*) FROM fcc_license_en')->fetchCol()[0],
+      'am' => $this->dbConnection->query('SELECT COUNT(*) FROM fcc_license_am')->fetchCol()[0],  
+    ];
+  }
+
+  /**
+   * Report import counts.
+   *
+   * @return string
+   *   Multiline report.
+   */
+  public function reportImportCounts() {
+    $counts = $this->getImportCounts();
+    $result = [
+      $this->getResultLine($counts, 'hd', self::MIN_ROW_COUNT_HD),
+      $this->getResultLine($counts, 'en', self::MIN_ROW_COUNT_EN),
+      $this->getResultLine($counts, 'am', self::MIN_ROW_COUNT_AM),
+    ];
+
+    return implode(PHP_EOL, $result);
+  }
+
+  /**
+   * Get result line for import count report.
+   *
+   * @param array $counts
+   *   Array of counts.
+   * @param string $key
+   *   Key
+   * @param int $min
+   *   Minimum expected count.
+   *
+   * @return TranslatableMarkup 
+   *   Report.
+   */
+  private function getResultLine($counts, $key, $min) {
+    if ($counts[$key] < $min) {
+      return $this->t('Error: fcc_license_@key has only @rows rows', [
+        '@key' => $key,
+        '@rows' => $counts[$key],
+      ]);
+    }
+    else {
+      return $this->t('fcc_license_@key has @rows rows', [
+        '@key' => $key,
+        '@rows' => $counts[$key],
+      ]);
     }
   }
 
