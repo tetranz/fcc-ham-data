@@ -6,6 +6,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drush\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -13,11 +14,11 @@ use Psr\Log\LoggerInterface;
  */
 class DataUtils {
 
-  const MIN_ROW_COUNT_HD = 1400000;
-  const MIN_ROW_COUNT_EN = 1400000;
-  const MIN_ROW_COUNT_AM = 1400000;
-
-  use StringTranslationTrait;
+  const MIN_ROW_COUNTS = [
+    'hd' => 1400000,
+    'en' => 1400000,
+    'am' =>1400000,
+  ];
 
   /**
    * The database connnection.
@@ -94,41 +95,27 @@ class DataUtils {
    */
   public function reportImportCounts() {
     $counts = $this->getImportCounts();
-    $result = [
-      $this->getResultLine($counts, 'hd', self::MIN_ROW_COUNT_HD),
-      $this->getResultLine($counts, 'en', self::MIN_ROW_COUNT_EN),
-      $this->getResultLine($counts, 'am', self::MIN_ROW_COUNT_AM),
-    ];
+    $msg = [];
+    $error = FALSE;
 
-    return implode(PHP_EOL, $result);
-  }
+    foreach (['hd', 'en', 'am'] as $key) {
+      $err = ($counts[$key] < self::MIN_ROW_COUNTS[$key]);
+      $error |= $err;
 
-  /**
-   * Get result line for import count report.
-   *
-   * @param array $counts
-   *   Array of counts.
-   * @param string $key
-   *   Key
-   * @param int $min
-   *   Minimum expected count.
-   *
-   * @return TranslatableMarkup 
-   *   Report.
-   */
-  private function getResultLine($counts, $key, $min) {
-    if ($counts[$key] < $min) {
-      return $this->t('Error: fcc_license_@key has only @rows rows', [
-        '@key' => $key,
-        '@rows' => $counts[$key],
-      ]);
+      if ($err) {
+        $text = 'Error: fcc_license_%s has only %s rows';
+      }
+      else {
+        $text = 'fcc_license_%s has %s rows';
+      }
+
+      $msg[] = sprintf($text, $key, $counts[$key]);
     }
-    else {
-      return $this->t('fcc_license_@key has @rows rows', [
-        '@key' => $key,
-        '@rows' => $counts[$key],
-      ]);
-    }
+
+    $msg = implode(PHP_EOL, $msg);
+    $this->logger->log($error ? LogLevel::ERROR : LogLevel::INFO, $msg);
+
+    return $msg;
   }
 
 }

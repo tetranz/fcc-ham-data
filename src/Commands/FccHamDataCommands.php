@@ -108,7 +108,7 @@ class FccHamDataCommands extends DrushCommands {
    * @command fcc_ham_data:report-input-counts
    */
   public function reportImportCounts() {
-    return $this->dataUtils->reportImportCounts();
+    $this->io()->writeln($this->dataUtils->reportImportCounts());
   }
 
 }
